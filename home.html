@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01001</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        pre {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <pre id="binary-output"></pre>
+    
+    <script>
+        let currentBinary = '';
+        
+        function randomBinary(length) {
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += Math.floor(Math.random() * 2);
+            }
+            return result;
+        }
+        
+        function addBinaryStrings(a, b) {
+            let result = '';
+            let carry = 0;
+            const maxLength = Math.max(a.length, b.length);
+            a = a.padStart(maxLength, '0');
+            b = b.padStart(maxLength, '0');
+            
+            for (let i = maxLength - 1; i >= 0; i--) {
+                const bitA = parseInt(a[i]);
+                const bitB = parseInt(b[i]);
+                const sum = bitA + bitB + carry;
+                result = (sum % 2) + result;
+                carry = sum > 1 ? 1 : 0;
+            }
+            
+            if (carry) result = '1' + result;
+            return result;
+        }
+        
+        function xorBinary(a, b) {
+            const maxLength = Math.max(a.length, b.length);
+            a = a.padStart(maxLength, '0');
+            b = b.padStart(maxLength, '0');
+            
+            let result = '';
+            for (let i = 0; i < maxLength; i++) {
+                result += a[i] === b[i] ? '0' : '1';
+            }
+            return result;
+        }
+        
+        function andBinary(a, b) {
+            const maxLength = Math.max(a.length, b.length);
+            a = a.padStart(maxLength, '0');
+            b = b.padStart(maxLength, '0');
+            
+            let result = '';
+            for (let i = 0; i < maxLength; i++) {
+                result += (a[i] === '1' && b[i] === '1') ? '1' : '0';
+            }
+            return result;
+        }
+        
+        function orBinary(a, b) {
+            const maxLength = Math.max(a.length, b.length);
+            a = a.padStart(maxLength, '0');
+            b = b.padStart(maxLength, '0');
+            
+            let result = '';
+            for (let i = 0; i < maxLength; i++) {
+                result += (a[i] === '1' || b[i] === '1') ? '1' : '0';
+            }
+            return result;
+        }
+        
+        function shiftLeft(binary, positions) {
+            return binary + '0'.repeat(positions);
+        }
+        
+        function shiftRight(binary, positions) {
+            return binary.length > positions ? binary.slice(0, -positions) : '0';
+        }
+        
+        function notBinary(binary) {
+            let result = '';
+            for (let i = 0; i < binary.length; i++) {
+                result += binary[i] === '1' ? '0' : '1';
+            }
+            return result;
+        }
+        
+        function performNextOperation() {
+            const operations = ['+', '^', '&', '|', '<<', '>>'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            
+            if (!currentBinary) {
+                currentBinary = randomBinary(Math.floor(Math.random() * 8) + 4);
+                return currentBinary;
+            }
+            
+            const binaryLength = Math.floor(Math.random() * 6) + 4;
+            const binary2 = operation === '~' ? '' : randomBinary(binaryLength);
+            
+            let result;
+            let operationText;
+            
+            switch(operation) {
+                case '+':
+                    result = addBinaryStrings(currentBinary, binary2);
+                    operationText = `${currentBinary} + ${binary2} = ${result}`;
+                    break;
+                case '^':
+                    result = xorBinary(currentBinary, binary2);
+                    operationText = `${currentBinary} ^ ${binary2} = ${result}`;
+                    break;
+                case '&':
+                    result = andBinary(currentBinary, binary2);
+                    operationText = `${currentBinary} & ${binary2} = ${result}`;
+                    break;
+                case '|':
+                    result = orBinary(currentBinary, binary2);
+                    operationText = `${currentBinary} | ${binary2} = ${result}`;
+                    break;
+                case '<<':
+                    const shiftLeftPositions = Math.floor(Math.random() * 3) + 1;
+                    result = shiftLeft(currentBinary, shiftLeftPositions);
+                    operationText = `${currentBinary} << ${shiftLeftPositions.toString(2)} = ${result}`;
+                    break;
+                case '>>':
+                    const shiftRightPositions = Math.floor(Math.random() * 3) + 1;
+                    result = shiftRight(currentBinary, shiftRightPositions);
+                    operationText = `${currentBinary} >> ${shiftRightPositions.toString(2)} = ${result}`;
+                    break;
+            }
+            
+            currentBinary = result;
+            return operationText;
+        }
+        
+        function updateDisplay() {
+            const outputElement = document.getElementById('binary-output');
+            outputElement.textContent = performNextOperation();
+            
+            if (currentBinary.length > 50) {
+                currentBinary = randomBinary(8);
+            }
+        }
+        
+        setInterval(updateDisplay, 2000);
+        updateDisplay();
+    </script>
+</body>
+</html>
